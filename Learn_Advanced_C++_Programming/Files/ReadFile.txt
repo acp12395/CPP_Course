@@ -1,0 +1,10 @@
+1. Population A: 123
+2. Population B:12
+3. Population C: 45000
+4. Population D:000321
+5. Population E: 0
+6. Population F:231334
+7. Population G: 3224
+8. Population H:678
+9. Population I:043
+10. Population J: 32156
