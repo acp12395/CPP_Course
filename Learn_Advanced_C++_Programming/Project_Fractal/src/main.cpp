@@ -5,6 +5,7 @@
 #include<math.h>
 #include"../header/Mandelbrot.h"
 #include"../header/Bitmap.h"
+#include"../header/ZoomList.h"
 
 using namespace std;
 using namespace project_fractal;
@@ -15,6 +16,10 @@ int main()
     const int HEIGHT = 600;
     Bitmap map(WIDTH,HEIGHT);
     string fileName{"image.bmp"};
+    ZoomList zoomList(WIDTH,HEIGHT);
+    zoomList.add(Zoom(WIDTH/2, HEIGHT/2, 4.0/WIDTH));
+    zoomList.add(Zoom(295, HEIGHT - 202, 0.1));
+    zoomList.add(Zoom(312, HEIGHT - 304, 0.1));
     unique_ptr<int[]> iterationsHistogram(new int[Mandelbrot::MAX_ITERATIONS]{0});
     unique_ptr<int[]> fractalIterations(new int[WIDTH*HEIGHT]{0});
     long total = 0;
@@ -22,9 +27,8 @@ int main()
     {
         for(int y = 0; y < HEIGHT; y++)
         {
-            double x_fractal = (x - WIDTH/2 - 200) * (2.0/HEIGHT);
-            double y_fractal = (y - HEIGHT/2) * (2.0/HEIGHT);
-            int iterations = Mandelbrot::getIterations(x_fractal,y_fractal);
+            pair<double,double> coords = zoomList.doZoom(x,y);
+            int iterations = Mandelbrot::getIterations(coords.first,coords.second);
             fractalIterations[y*WIDTH + x] = iterations;
             if(iterations < Mandelbrot::MAX_ITERATIONS)
             {
