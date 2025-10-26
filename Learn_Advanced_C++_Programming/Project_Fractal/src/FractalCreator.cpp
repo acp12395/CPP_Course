@@ -1,4 +1,5 @@
 #include"../header/FractalCreator.h"
+#include"../header/RGB.h"
 
 using namespace std;
 
@@ -34,6 +35,9 @@ void FractalCreator::calculateIterations()
 
 void FractalCreator::drawFractal()
 {
+    RGB RGB_Start(10,20,40);
+    RGB RGB_Finish(50,100,200);
+    RGB RGB_Diff = RGB_Finish - RGB_Start;
     for(int x = 0; x < m_width; x++)
     {
         for(int y = 0; y < m_height; y++)
@@ -47,7 +51,10 @@ void FractalCreator::drawFractal()
                     hue += (static_cast<double>(m_iterationsHistogram[i]))/m_total;
                 }
             }
-            m_map.setPixel(x,y,0,hue*255,0);
+            uint8_t red = RGB_Start.r + RGB_Diff.r*hue;
+            uint8_t green = RGB_Start.g + RGB_Diff.g*hue;
+            uint8_t blue = RGB_Start.b + RGB_Diff.b*hue;
+            m_map.setPixel(x,y,red,green,blue);
         }
     }
 }
