@@ -1,4 +1,3 @@
-#include <iostream>
 #include "../header/ZoomList.h"
 
 using namespace project_fractal;
@@ -13,8 +12,6 @@ void ZoomList::add(const Zoom& zoom)
     m_yCenter += (zoom.y - m_height/2)*m_scale;
 
     m_scale *= zoom.scale;
-
-    cout << m_xCenter << ", " << m_yCenter << ", " << m_scale << endl;
 }
 
 pair<double,double> ZoomList::doZoom(int x, int y)

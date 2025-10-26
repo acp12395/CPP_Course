@@ -52,4 +52,12 @@ void Bitmap::setPixel(int32_t x, int32_t y, uint8_t red, uint8_t green, uint8_t 
 
 Bitmap::~Bitmap(){}
 
+
+Bitmap& Bitmap::operator=(const Bitmap& bitmap)
+{
+    m_width = bitmap.m_width;
+    m_height = bitmap.m_width;
+    return *this;
+}
+
 }
