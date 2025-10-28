@@ -1,10 +1,23 @@
+#include<cassert>
 #include"../header/FractalCreator.h"
-#include"../header/RGB.h"
 
 using namespace std;
 
 namespace project_fractal
 {
+
+void FractalCreator::addRange(double range, const RGB& rgb)
+{
+    m_ranges.push_back(range*Mandelbrot::MAX_ITERATIONS);
+    m_colors.push_back(rgb);
+
+    if(m_bGotFirstRange)
+    {
+        m_rangeTotals.push_back(0);
+    }
+
+    m_bGotFirstRange = true;
+}
 
 FractalCreator::FractalCreator(int width, int height):
     m_width(width),
@@ -33,27 +46,78 @@ void FractalCreator::calculateIterations()
     }
 }
 
+void FractalCreator::calculateRangeTotals()
+{
+    int rangeIndex = 0;
+
+    for(int i = 0; i < Mandelbrot::MAX_ITERATIONS; i++)
+    {
+        int pixels = m_iterationsHistogram[i];
+        if(i >= m_ranges[rangeIndex+1])
+        {
+            rangeIndex++;
+        }
+        m_rangeTotals[rangeIndex] += pixels;
+    }
+
+    for(auto value : m_rangeTotals)
+    {
+        cout << "Range total: " << value << endl;
+    }
+}
+
+int FractalCreator::getRange(int iterations) const
+{
+    int range = 0;
+
+    for(int i = 1; i < m_ranges.size(); i++)
+    {
+        range = i;
+        if(m_ranges[i] > iterations)
+        {
+            break;
+        }
+    }
+    range--;
+
+    assert(range >= 0);
+    assert(range < m_ranges.size());
+
+    return range;
+}
+
 void FractalCreator::drawFractal()
 {
-    RGB RGB_Start(10,20,40);
-    RGB RGB_Finish(50,100,200);
-    RGB RGB_Diff = RGB_Finish - RGB_Start;
     for(int x = 0; x < m_width; x++)
     {
         for(int y = 0; y < m_height; y++)
         {
             int iterations = m_fractalIterations[y*m_width+ x];
-            double hue = 0.0;
+
+            int range = getRange(iterations);
+            int rangeTotal = m_rangeTotals[range];
+            int rangeStart = m_ranges[range];
+
+            RGB& startColor = m_colors[range];
+            RGB& endColor = m_colors[range + 1];
+            RGB colorDiff = endColor - startColor;
+
+            int totalPixels = 0;
+            uint8_t red = 0;
+            uint8_t green = 0;
+            uint8_t blue = 0;
+
             if(iterations < Mandelbrot::MAX_ITERATIONS)
             {
-                for(int i = 0; i <= iterations; i++)
+                for(int i = rangeStart; i <= iterations; i++)
                 {
-                    hue += (static_cast<double>(m_iterationsHistogram[i]))/m_total;
+                    totalPixels += m_iterationsHistogram[i];
                 }
+
+                red = startColor.r + colorDiff.r*(double)totalPixels/rangeTotal;
+                green = startColor.g + colorDiff.g*(double)totalPixels/rangeTotal;
+                blue = startColor.b + colorDiff.b*(double)totalPixels/rangeTotal;
             }
-            uint8_t red = RGB_Start.r + RGB_Diff.r*hue;
-            uint8_t green = RGB_Start.g + RGB_Diff.g*hue;
-            uint8_t blue = RGB_Start.b + RGB_Diff.b*hue;
             m_map.setPixel(x,y,red,green,blue);
         }
     }

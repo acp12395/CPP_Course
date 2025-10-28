@@ -4,11 +4,13 @@
 #include<iostream>
 #include<string>
 #include<memory>
+#include<vector>
 #include<math.h>
 #include "Zoom.h"
 #include "Bitmap.h"
 #include "ZoomList.h"
 #include "Mandelbrot.h"
+#include "RGB.h"
 
 using namespace std;
 
@@ -25,6 +27,14 @@ private:
     Bitmap m_map;
     ZoomList m_zoomList;
     long m_total{0};
+
+    vector<int> m_ranges;
+    vector<RGB> m_colors;
+    vector<int> m_rangeTotals;
+
+    bool m_bGotFirstRange{false};
+
+    int getRange(int iterations) const;
 public:
     FractalCreator(int, int);
 
@@ -32,6 +42,8 @@ public:
     void drawFractal();
     void addZoom(const Zoom&);
     void writeBitmap(string);
+    void addRange(double range, const RGB& rgb);
+    void calculateRangeTotals();
 
     ~FractalCreator();
 };
